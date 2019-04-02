@@ -113,7 +113,7 @@ class SAMIReader(object):
     def __init__(self, target, tidy=False):
         if hasattr(target, 'read') and callable(target.read):
             self.file_handle = target
-        self.deleted = '_dels' in target.encode('utf-8')
+        self.deleted = '_dels' in target.read().encode('utf-8')
         self.tidy = tidy
 
     def __iter__(self):
