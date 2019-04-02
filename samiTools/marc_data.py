@@ -692,6 +692,9 @@ class Field(object):
             return subfield
         raise StopIteration
 
+    def next(self):
+        return self.__next__()
+
     def __str__(self):
         if self.is_control_field() or self.tag in ALEPH_CONTROL_FIELDS:
             text = '={0}  {1}'.format(self.tag, self.data.replace(' ', '#'))
