@@ -113,7 +113,7 @@ class SAMIReader(object):
     def __init__(self, target, tidy=False):
         if hasattr(target, 'read') and callable(target.read):
             self.file_handle = target
-        self.deleted = '_dels' in str(target)
+        self.deleted = '_dels' in target.encode('utf-8')
         self.tidy = tidy
 
     def __iter__(self):
@@ -231,7 +231,7 @@ class SAMIRecord(object):
         return self.record.as_xml(namespace=namespace)
 
     def __str__(self):
-        return str(self.record)
+        return self.record.encode('utf-8')
 
     def identifier(self):
         try: return clean_text(self.record['001'].data.replace('CKEY', '').strip())
@@ -504,7 +504,7 @@ class MARCRecord(object):
         leader = '%05d%s%05d%s' % (record_length, self.leader[5:12], base_address, self.leader[17:])
 
         text_list = ['=LDR  {0}'.format(leader)]
-        text_list.extend([str(field) for field in self.fields])
+        text_list.extend([field.encode('utf-8') for field in self.fields])
         return '\n'.join(text_list) + '\n'
 
     def add_field(self, *fields):
@@ -578,9 +578,9 @@ class MARCRecord(object):
             entry_data = marc[base_address + entry_offset:base_address + entry_offset + entry_length - 1]
 
             # Check if tag is a control field
-            if str(entry_tag) < '010' and entry_tag.isdigit():
+            if entry_tag.encode('utf-8') < '010' and entry_tag.isdigit():
                 field = Field(tag=entry_tag, data=entry_data.decode('utf-8'))
-            elif str(entry_tag) in ALEPH_CONTROL_FIELDS:
+            elif entry_tag.encode('utf-8') in ALEPH_CONTROL_FIELDS:
                 field = Field(tag=entry_tag, data=entry_data.decode('utf-8'))
 
             else:
@@ -663,16 +663,16 @@ class Field(object):
     def __init__(self, tag, indicators=None, subfields=None, data=''):
         if indicators is None: indicators = []
         if subfields is None: subfields = []
-        indicators = [str(x) for x in indicators]
+        indicators = [x.encode('utf-8') for x in indicators]
 
         # Normalize tag to three digits
         self.tag = '%03s' % tag
 
         # Check if tag is a control field
         if self.tag < '010' and self.tag.isdigit():
-            self.data = str(data)
+            self.data = data.encode('utf-8')
         elif self.tag in ALEPH_CONTROL_FIELDS:
-            self.data = str(data)
+            self.data = data.encode('utf-8')
         else:
             self.indicator1, self.indicator2 = self.indicators = indicators
             self.subfields = subfields
@@ -720,7 +720,7 @@ class Field(object):
         values = []
         for subfield in self:
             if len(codes) == 0 or subfield[0] in codes:
-                values.append(str(subfield[1]))
+                values.append(subfield[1].encode('utf-8'))
         return values
 
     def add_subfield(self, code, value):

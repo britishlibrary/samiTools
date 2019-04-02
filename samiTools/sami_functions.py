@@ -8,7 +8,6 @@ import datetime
 import fileinput
 import gc
 import getopt
-import html
 import locale
 import os
 import re
@@ -16,6 +15,14 @@ import string
 import sys
 import textwrap
 import unicodedata
+
+if sys.version_info[0] < 3:
+    from cgi import escape
+    import HTMLParser
+    def unescape(input):
+        return HTMLParser.HTMLParser().unescape(input)
+else:
+    from html import escape,unescape
 
 __author__ = 'Victoria Morris'
 __license__ = 'MIT License'
@@ -103,4 +110,4 @@ def exit_prompt(message=None):
 def clean_text(s):
     """Function to remove control characters and escape invalid HTML characters <>&"""
     if s is None or not s: return None
-    return html.escape(re.sub(r'[\u0000-\u001F\u007F-\u009F]', '', html.unescape(s)))
+    return escape(re.sub(r'[\u0000-\u001F\u007F-\u009F]', '', unescape(s)))
