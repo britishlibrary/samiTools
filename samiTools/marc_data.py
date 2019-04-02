@@ -137,6 +137,8 @@ class SAMIReader(object):
             if not line: break
         if not chunk: raise StopIteration
         return self.record(data=chunk, tidy=self.tidy)
+    def next(self):
+        return self.__next__()
 
     def while_chunk(self, line):
         if 'xmlns:xsi' in line: return True
