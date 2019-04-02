@@ -6,7 +6,10 @@
 # Import required modules
 import re
 from distutils.core import setup
-import py2exe
+import sys
+
+if sys.platform == "win32":
+    import py2exe
 
 __author__ = 'Victoria Morris'
 __license__ = 'MIT License'

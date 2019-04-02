@@ -52,16 +52,16 @@ class FilePath:
         self.path = path
         expected_ext = ['.txt', '.prn', '.xml'] if self.function == 'input' else ['.lex', '.xml']
         if not path or path == '':
-            exit_prompt('Error: Could not parse path to {} file'.format(self.function))
+            exit_prompt('Error: Could not parse path to {0} file'.format(self.function))
         try:
             self.filename, self.ext = os.path.splitext(os.path.basename(path))
             self.folder = os.path.dirname(path)
         except:
-            exit_prompt('Error: Could not parse path to {} file'.format(self.function))
+            exit_prompt('Error: Could not parse path to {0} file'.format(self.function))
         if self.ext not in expected_ext:
-            exit_prompt('Error: The specified file should have the extension {}'.format(' or '.join(expected_ext)))
+            exit_prompt('Error: The specified file should have the extension {0}'.format(' or '.join(expected_ext)))
         if 'output' not in self.function and not os.path.isfile(os.path.join(self.folder, self.filename + self.ext)):
-            exit_prompt('Error: The specified {} file cannot be found'.format(self.function))
+            exit_prompt('Error: The specified {0} file cannot be found'.format(self.function))
 
 
 # ====================
@@ -71,7 +71,7 @@ class FilePath:
 
 def print_opt(o, v, indent=5):
     """Function to print information about options/arguments for a function"""
-    print('{}{:<10}  {:<40}'.format(' ' * indent, o, textwrap.fill(v, width=60 - indent, subsequent_indent=' ' * (indent + 12))))
+    print('{0}{1:<10}  {2:<40}'.format(' ' * indent, o, textwrap.fill(v, width=60 - indent, subsequent_indent=' ' * (indent + 12))))
 
 
 def date_time(message='All processing complete'):

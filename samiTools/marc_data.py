@@ -106,7 +106,7 @@ def sami_factory(reader_type, target, tidy=False):
     if reader_type == 'prn': return SAMIReaderPRN(target, tidy)
     if reader_type == 'xml': return SAMIReaderXML(target, tidy)
     if reader_type == 'txt': return SAMIReaderText(target, tidy)
-    raise Exception('The reader_type {} is not supported.'.format(reader_type))
+    raise Exception('The reader_type {0} is not supported.'.format(reader_type))
 
 
 class SAMIReader(object):
@@ -244,11 +244,11 @@ class SAMIRecord(object):
     def header(self, deleted=False):
         if self.deleted or deleted:
             return '\n<header status="deleted">\n' \
-                   '<identifier>{}</identifier>\n' \
-                   '<datestamp>{}</datestamp>\n' \
+                   '<identifier>{0}</identifier>\n' \
+                   '<datestamp>{1}</datestamp>\n' \
                    '</header>\n'.format(self.identifier(), self.datestamp())
         return '\n<header>\n' \
-               '<identifier>{}</identifier>\n' \
+               '<identifier>{0}</identifier>\n' \
                '</header>\n'.format(self.identifier())
 
     def is_bad(self):
@@ -452,7 +452,7 @@ class MARCWriter(object):
 
 class MARCRecord(object):
     def __init__(self, data='', leader=' ' * LEADER_LENGTH):
-        self.leader = '{}22{}4500'.format(leader[0:10], leader[12:20])
+        self.leader = '{0}22{1}4500'.format(leader[0:10], leader[12:20])
         self.fields = list()
         self.pos = 0
         if len(data) > 0: self.decode_marc(data)
@@ -495,7 +495,7 @@ class MARCRecord(object):
         record_length = base_address + len(fields)
         leader = '%05d%s%05d%s' % (record_length, self.leader[5:12], base_address, self.leader[17:])
 
-        text_list = ['=LDR  {}'.format(leader)]
+        text_list = ['=LDR  {0}'.format(leader)]
         text_list.extend([str(field) for field in self.fields])
         return '\n'.join(text_list) + '\n'
 
@@ -591,7 +591,7 @@ class MARCRecord(object):
                         subfields.append(code)
                         subfields.append(data)
                     except:
-                        print('Error in subfield code in field {}'.format(entry_tag))
+                        print('Error in subfield code in field {0}'.format(entry_tag))
                 field = Field(
                     tag=entry_tag,
                     indicators=[first_indicator, second_indicator],
@@ -644,7 +644,7 @@ class MARCRecord(object):
         base_address = LEADER_LENGTH + len(directory)
         record_length = base_address + len(fields)
         leader = '%05d%s%05d%s' % (record_length, self.leader[5:12], base_address, self.leader[17:])
-        xml += '\n\t\t<marc:leader>{}</marc:leader>'.format(leader)
+        xml += '\n\t\t<marc:leader>{0}</marc:leader>'.format(leader)
         for field in self.fields:
             xml += '\n' + field.as_xml()
         return xml + '\n\t</marc:record>'
@@ -693,15 +693,15 @@ class Field(object):
 
     def __str__(self):
         if self.is_control_field() or self.tag in ALEPH_CONTROL_FIELDS:
-            text = '={}  {}'.format(self.tag, self.data.replace(' ', '#'))
+            text = '={0}  {1}'.format(self.tag, self.data.replace(' ', '#'))
         else:
-            text = '={}  '.format(self.tag)
+            text = '={0}  '.format(self.tag)
             for indicator in self.indicators:
                 if indicator in (' ', '#'): text += '#'
                 else: text += indicator
             text += ' '
             for subfield in self:
-                text += '${}{}'.format(subfield[0], subfield[1])
+                text += '${0}{1}'.format(subfield[0], subfield[1])
         return text
 
     def get_subfields(self, *codes):
@@ -731,8 +731,8 @@ class Field(object):
 
     def as_xml(self):
         if self.is_control_field():
-            return '\t\t<marc:controlfield tag="{}">{}</marc:controlfield>'.format(self.tag, clean_text(self.data))
-        xml = '\t\t<marc:datafield tag="{}" ind1="{}" ind2="{}">'.format(self.tag, self.indicator1, self.indicator2)
+            return '\t\t<marc:controlfield tag="{0}">{1}</marc:controlfield>'.format(self.tag, clean_text(self.data))
+        xml = '\t\t<marc:datafield tag="{0}" ind1="{1}" ind2="{2}">'.format(self.tag, self.indicator1, self.indicator2)
         for subfield in self:
-            xml += '\n\t\t\t<marc:subfield code="{}">{}</marc:subfield>'.format(subfield[0], clean_text(subfield[1].strip()))
+            xml += '\n\t\t\t<marc:subfield code="{0}">{1}</marc:subfield>'.format(subfield[0], clean_text(subfield[1].strip()))
         return xml + '\n\t\t</marc:datafield>'

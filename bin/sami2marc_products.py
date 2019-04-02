@@ -121,7 +121,7 @@ to MARC 21 Bibliographic files in MARC exchange (.lex) or MARC XML format\
     try:
         opts, args = getopt.getopt(argv, 'hi:o:m:x', ['input_path=', 'output_path=', 'max_size=', 'header', 'help'])
     except getopt.GetoptError as err:
-        exit_prompt('Error: {}'.format(err))
+        exit_prompt('Error: {0}'.format(err))
     if opts is None or not opts:
         usage()
     for opt, arg in opts:
@@ -147,7 +147,7 @@ to MARC 21 Bibliographic files in MARC exchange (.lex) or MARC XML format\
                                               'optionally followed by the suffix K.')
             if limit == 'size': max_size *= 1024
         else:
-            exit_prompt('Error: Option {} not recognised'.format(opt))
+            exit_prompt('Error: Option {0} not recognised'.format(opt))
 
     if not input_path:
         exit_prompt('Error: No path to input files has been specified')
@@ -168,14 +168,14 @@ to MARC 21 Bibliographic files in MARC exchange (.lex) or MARC XML format\
 
     # Display confirmation information about the transformation
 
-    print('Input folder: {}'.format(input_path))
-    print('Output folder: {}'.format(output_path))
-    print('Output format: {}'.format('MARC XML (.xml)' if xml else 'MARC (.lex)'))
+    print('Input folder: {0}'.format(input_path))
+    print('Output folder: {0}'.format(output_path))
+    print('Output format: {0}'.format('MARC XML (.xml)' if xml else 'MARC (.lex)'))
     if limit:
         if max_size == 1:
             split = True
             print('Output file will be split into individual records')
-        else: print('Maximum file size : {} {}'.format(str(max_size), 'bytes' if limit == 'size' else 'records'))
+        else: print('Maximum file size : {0} {1}'.format(str(max_size), 'bytes' if limit == 'size' else 'records'))
     if header:
         print('MetAg headers will be used')
 
@@ -191,7 +191,7 @@ to MARC 21 Bibliographic files in MARC exchange (.lex) or MARC XML format\
                 root = root + ext
                 ext = '.xml'
 
-            date_time('Processing file {} ...'.format(str(file)))
+            date_time('Processing file {0} ...'.format(str(file)))
             if '_dels' in root:
                 deleted = True
                 print('File contains deleted records')
@@ -211,28 +211,28 @@ to MARC 21 Bibliographic files in MARC exchange (.lex) or MARC XML format\
                 for record in reader:
                     record_count += 1
                     if record_count % 100 == 0:
-                        print('{} records processed'.format(str(record_count)), end='\r')
-                    filename = os.path.join(output_path, (record.identifier() or '_NO IDENTIFIER {}'.format(str(record_count))) + ext)
+                        print('{0} records processed'.format(str(record_count)), end='\r')
+                    filename = os.path.join(output_path, (record.identifier() or '_NO IDENTIFIER {0}'.format(str(record_count))) + ext)
                     file_count = 0
                     while os.path.isfile(filename):
                         file_count += 1
-                        filename = os.path.join(output_path, (record.identifier() or '_NO IDENTIFIER {}'.format(str(record_count))) + '_DUPLICATE {}'.format(str(file_count)) + ext)
+                        filename = os.path.join(output_path, (record.identifier() or '_NO IDENTIFIER {0}'.format(str(record_count))) + '_DUPLICATE {0}'.format(str(file_count)) + ext)
                     if xml:
                         current_file = open(filename, 'w', encoding='utf-8', errors='replace')
                         if header:
                             current_file.write(METAG_HEADER + record.header(deleted=deleted))
                             if not (deleted or record.deleted):
-                                current_file.write('<metadata>{}\n</metadata>\n'.format(record.as_xml(namespace=True)))
+                                current_file.write('<metadata>{0}\n</metadata>\n'.format(record.as_xml(namespace=True)))
                             current_file.write('</record>')
                         else:
-                            current_file.write('{}{}\n</marc:collection>'.format(XML_HEADER, record.as_xml()))
+                            current_file.write('{0}{1}\n</marc:collection>'.format(XML_HEADER, record.as_xml()))
                     else:
                         current_file = open(filename, mode='wb')
                         writer = MARCWriter(current_file)
                         writer.write(record)
                     current_file.close()
                 ifile.close()
-                print('{} records processed'.format(str(record_count)), end='\r')
+                print('{0} records processed'.format(str(record_count)), end='\r')
                 continue
 
             # All other cases
@@ -243,7 +243,7 @@ to MARC 21 Bibliographic files in MARC exchange (.lex) or MARC XML format\
             if limit == 'size':
                 FMT = ".%%0%dd" % (int(log10(os.path.getsize(os.path.join(input_path, file)) / max_size)) + 1)
 
-            mid = FMT % current_idx if limit == 'size' else '.{}'.format(str(current_idx)) if limit == 'number' else ''
+            mid = FMT % current_idx if limit == 'size' else '.{0}'.format(str(current_idx)) if limit == 'number' else ''
             filename = os.path.join(output_path, root + mid + ext)
 
             if xml:
@@ -257,7 +257,7 @@ to MARC 21 Bibliographic files in MARC exchange (.lex) or MARC XML format\
                 record_count += 1
                 record_count_in_file += 1
                 if record_count % 100 == 0:
-                    print('{} records processed'.format(str(record_count)), end='\r')
+                    print('{0} records processed'.format(str(record_count)), end='\r')
 
                 # Check whether we need to start a new file
                 current_size += len(record.as_xml()) if xml else len(record.as_marc())
@@ -265,12 +265,12 @@ to MARC 21 Bibliographic files in MARC exchange (.lex) or MARC XML format\
                         or (limit == 'number' and record_count_in_file > max_size):
                     if xml: current_file.write(CLOSE)
                     current_file.close()
-                    print('{} records processed'.format(str(record_count)), end='\r')
-                    print('\nFile {} done'.format(str(current_idx)))
+                    print('{0} records processed'.format(str(record_count)), end='\r')
+                    print('\nFile {0} done'.format(str(current_idx)))
                     current_size = len(record.as_xml()) if xml else len(record.as_marc())
                     record_count_in_file = 0
                     current_idx += 1
-                    mid = FMT % current_idx if limit == 'size' else '.{}'.format(str(current_idx)) if limit == 'number' else ''
+                    mid = FMT % current_idx if limit == 'size' else '.{0}'.format(str(current_idx)) if limit == 'number' else ''
                     filename = os.path.join(output_path, root + mid + ext)
                     if xml:
                         current_file = open(filename, 'w', encoding='utf-8', errors='replace')
@@ -279,15 +279,15 @@ to MARC 21 Bibliographic files in MARC exchange (.lex) or MARC XML format\
                         current_file = open(filename, mode='wb')
                         writer = MARCWriter(current_file)
 
-                record_to_write = '{}{}{}</record>'.format(OAI_RECORD, record.header(deleted=deleted),
-                                                           '<metadata>{}\n</metadata>\n'.format(record.as_xml(namespace=True)) if not (deleted or record.deleted) else '') if header \
+                record_to_write = '{0}{1}{2}</record>'.format(OAI_RECORD, record.header(deleted=deleted),
+                                                           '<metadata>{0}\n</metadata>\n'.format(record.as_xml(namespace=True)) if not (deleted or record.deleted) else '') if header \
                     else record.as_xml()
 
                 if xml: current_file.write(record_to_write)
                 else: writer.write(record)
 
             if xml: current_file.write(CLOSE)
-            print('{} records processed'.format(str(record_count)), end='\r')
+            print('{0} records processed'.format(str(record_count)), end='\r')
             # Close files
             for f in [ifile, current_file]:
                 f.close()

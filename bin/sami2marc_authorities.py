@@ -147,7 +147,7 @@ to MARC 21 Authority files in MARC exchange (.lex) or MARC XML format\
 
     try: opts, args = getopt.getopt(argv, 'hi:o:m:d:t', ['ifile=', 'ofile=', 'max_size=', 'header', 'date=', 'tidy', 'help'])
     except getopt.GetoptError as err:
-        exit_prompt('Error: {}'.format(err))
+        exit_prompt('Error: {0}'.format(err))
     if opts is None or not opts:
         usage()
     for opt, arg in opts:
@@ -173,13 +173,13 @@ to MARC 21 Authority files in MARC exchange (.lex) or MARC XML format\
                                               'optionally followed by the suffix K.')
             if limit == 'size': max_size *= 1024
         else:
-            exit_prompt('Error: Option {} not recognised'.format(opt))
+            exit_prompt('Error: Option {0} not recognised'.format(opt))
 
     if date and limit: exit_prompt('Error: Options --date and --max_size cannot be used at the same time')
 
     for f in ['input', 'output']:
         if not files[f]:
-            exit_prompt('Error: No path to {} file has been specified'.format(f))
+            exit_prompt('Error: No path to {0} file has been specified'.format(f))
     if files['output'].ext == '.xml': xml = True
 
     # Check date format and create extra files for MetAg output
@@ -189,13 +189,13 @@ to MARC 21 Authority files in MARC exchange (.lex) or MARC XML format\
         try: date = datetime.datetime.strptime(date, '%Y%m%d')
         except: exit_prompt('The date parameter must be in the format yyyymmdd')
         files['pre'] = FilePath((files['output'].path).replace(files['output'].ext,
-                                                               '_pre_{}{}'.format(date.strftime('%Y%m%d'), files['output'].ext)),
+                                                               '_pre_{0}{1}'.format(date.strftime('%Y%m%d'), files['output'].ext)),
                                                                'output pre date')
         files['post'] = FilePath((files['output'].path).replace(files['output'].ext,
-                                                                '_post_{}{}'.format(date.strftime('%Y%m%d'), files['output'].ext)),
+                                                                '_post_{0}{1}'.format(date.strftime('%Y%m%d'), files['output'].ext)),
                                                                 'output post date')
 
-    files['errors'] = FilePath((files['output']).path.replace(files['output'].ext, '_errors{}'.format(files['output'].ext)), 'error output')
+    files['errors'] = FilePath((files['output']).path.replace(files['output'].ext, '_errors{0}'.format(files['output'].ext)), 'error output')
 
     # --------------------
     # Parameters seem OK => start program
@@ -203,16 +203,16 @@ to MARC 21 Authority files in MARC exchange (.lex) or MARC XML format\
 
     # Display confirmation information about the transformation
 
-    print('Input file: {}'.format(files['input'].path))
-    print('Output file: {}'.format(files['output'].path))
-    print('Output format: {}'.format('MARC XML (.xml)' if xml else 'MARC (.lex)'))
+    print('Input file: {0}'.format(files['input'].path))
+    print('Output file: {0}'.format(files['output'].path))
+    print('Output format: {0}'.format('MARC XML (.xml)' if xml else 'MARC (.lex)'))
     if limit:
         if max_size == 1:
             split = True
             print('Output file will be split into individual records')
-        else: print('Maximum file size : {} {}'.format(str(max_size), 'bytes' if limit == 'size' else 'records'))
+        else: print('Maximum file size : {0} {1}'.format(str(max_size), 'bytes' if limit == 'size' else 'records'))
     if date:
-        print('\nDate for splitting output: {}'.format(date.strftime('%Y%m%d')))
+        print('\nDate for splitting output: {0}'.format(date.strftime('%Y%m%d')))
     if tidy: print('Output will be tidied for MetAg use.\n')
     if header: print('MetAg headers will be used')
 
@@ -242,18 +242,18 @@ to MARC 21 Authority files in MARC exchange (.lex) or MARC XML format\
         for record in reader:
             record_count += 1
             if record_count % 100 == 0:
-                print('{} records processed'.format(str(record_count)), end='\r')
-            filename = os.path.join(output_path, (record.identifier() or '_NO IDENTIFIER {}'.format(str(record_count))) + ext)
+                print('{0} records processed'.format(str(record_count)), end='\r')
+            filename = os.path.join(output_path, (record.identifier() or '_NO IDENTIFIER {0}'.format(str(record_count))) + ext)
             file_count = 0
             while os.path.isfile(filename):
                 file_count += 1
-                filename = os.path.join(output_path, (record.identifier() or '_NO IDENTIFIER {}'.format(str(record_count))) + '_DUPLICATE {}'.format(str(file_count)) + ext)
+                filename = os.path.join(output_path, (record.identifier() or '_NO IDENTIFIER {0}'.format(str(record_count))) + '_DUPLICATE {0}'.format(str(file_count)) + ext)
             if xml:
                 current_file = open(filename, 'w', encoding='utf-8', errors='replace')
                 if header:
-                    current_file.write('{}{}<metadata>{}\n</metadata>\n</record>'.format(METAG_HEADER, record.header(), record.as_xml(namespace=True)))
+                    current_file.write('{0}{1}<metadata>{2}\n</metadata>\n</record>'.format(METAG_HEADER, record.header(), record.as_xml(namespace=True)))
                 else:
-                    current_file.write('{}{}\n</marc:collection>'.format(XML_HEADER, record.as_xml()))
+                    current_file.write('{0}{1}\n</marc:collection>'.format(XML_HEADER, record.as_xml()))
             else:
                 current_file = open(filename, mode='wb')
                 writer = MARCWriter(current_file)
@@ -268,7 +268,7 @@ to MARC 21 Authority files in MARC exchange (.lex) or MARC XML format\
         if limit == 'size':
             FMT = ".%%0%dd" % (int(log10(os.path.getsize(files['input'].path) / max_size)) + 1)
 
-        mid = FMT % current_idx if limit == 'size' else '.{}'.format(str(current_idx)) if limit == 'number' else ''
+        mid = FMT % current_idx if limit == 'size' else '.{0}'.format(str(current_idx)) if limit == 'number' else ''
         filename = os.path.join(output_path, root + mid + ext)
 
         for f in files:
@@ -291,7 +291,7 @@ to MARC 21 Authority files in MARC exchange (.lex) or MARC XML format\
             record_count += 1
             record_count_in_file += 1
             if record_count % 100 == 0:
-                print('{} records processed'.format(str(record_count)), end='\r')
+                print('{0} records processed'.format(str(record_count)), end='\r')
 
             # Check whether we need to start a new file
             current_size += len(record.as_xml()) if xml else len(record.as_marc())
@@ -299,12 +299,12 @@ to MARC 21 Authority files in MARC exchange (.lex) or MARC XML format\
                     or (limit == 'number' and record_count_in_file > max_size):
                 if xml: current_file.write(CLOSE)
                 current_file.close()
-                print('{} records processed'.format(str(record_count)), end='\r')
-                print('\nFile {} done'.format(str(current_idx)))
+                print('{0} records processed'.format(str(record_count)), end='\r')
+                print('\nFile {0} done'.format(str(current_idx)))
                 current_size = len(record.as_xml()) if xml else len(record.as_marc())
                 record_count_in_file = 0
                 current_idx += 1
-                mid = FMT % current_idx if limit == 'size' else '.{}'.format(
+                mid = FMT % current_idx if limit == 'size' else '.{0}'.format(
                     str(current_idx)) if limit == 'number' else ''
                 filename = os.path.join(output_path, root + mid + ext)
                 if xml:
@@ -314,7 +314,7 @@ to MARC 21 Authority files in MARC exchange (.lex) or MARC XML format\
                     current_file = open(filename, mode='wb')
                     writer = MARCWriter(current_file)
 
-            record_to_write = '{}{}<metadata>{}\n</metadata>\n</record>'.format(OAI_RECORD, record.header(), record.as_xml(namespace=True)) if header \
+            record_to_write = '{0}{1}<metadata>{2}\n</metadata>\n</record>'.format(OAI_RECORD, record.header(), record.as_xml(namespace=True)) if header \
                 else record.as_xml()
 
             if record.is_bad():
@@ -343,7 +343,7 @@ to MARC 21 Authority files in MARC exchange (.lex) or MARC XML format\
             if f != 'input' and files[f] and files[f].file_object:
                 files[f].file_object.write(CLOSE)
 
-    print('{} records processed'.format(str(record_count)), end='\r')
+    print('{0} records processed'.format(str(record_count)), end='\r')
 
     # Close files
     for f in [ifile, current_file]:
