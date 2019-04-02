@@ -3,7 +3,6 @@
 """MARC record processing tools used within samiTools."""
 
 # Import required modules
-
 from samiTools.sami_functions import *
 
 __author__ = 'Victoria Morris'
@@ -153,7 +152,7 @@ class SAMIReader(object):
 class SAMIReaderAuthorities(SAMIReader):
 
     def __init__(self, target, tidy=False):
-        super().__init__(target, tidy)
+        super(SAMIReaderAuthorities, self).__init__(target, tidy)
 
     def while_chunk(self, line):
         if 'xmlns:xsi' in line: return True
@@ -172,7 +171,7 @@ class SAMIReaderAuthorities(SAMIReader):
 class SAMIReaderText(SAMIReader):
 
     def __init__(self, target, tidy=False):
-        super().__init__(target, tidy)
+        super(SAMIReaderText, self).__init__(target, tidy)
 
     def record(self, data, tidy):
         return SAMIRecordText(data=data, tidy=tidy)
@@ -185,7 +184,7 @@ class SAMIReaderText(SAMIReader):
 class SAMIReaderPRN(SAMIReader):
 
     def __init__(self, target, tidy=False):
-        super().__init__(target, tidy)
+        super(SAMIReaderPRN, self).__init__(target, tidy)
 
     def record(self, data, tidy):
         return SAMIRecordPRN(data=data, tidy=tidy)
@@ -199,7 +198,7 @@ class SAMIReaderPRN(SAMIReader):
 class SAMIReaderXML(SAMIReader):
 
     def __init__(self, target, tidy=False):
-        super().__init__(target, tidy)
+        super(SAMIReaderXML, self).__init__(target, tidy)
 
     def record(self, data, tidy):
         return SAMIRecordXML(data=data, tidy=tidy)
@@ -258,7 +257,7 @@ class SAMIRecord(object):
 class SAMIRecordAuthorities(SAMIRecord):
 
     def __init__(self, data, tidy=False):
-        super().__init__(data, tidy)
+        super(SAMIRecordAuthorities, self).__init__(data, tidy)
 
         self.data = re.sub(r'\n[ ]{4,}', ' ', self.data)
         self.sid, self.fmt, self.level, self.created, self.created_by, self.modified, self.modified_by, self.cataloged, self.source = data.split('\n', 1)[0].rstrip('\t').split('\t\t')
@@ -316,7 +315,7 @@ class SAMIRecordAuthorities(SAMIRecord):
 class SAMIRecordPRN(SAMIRecord):
 
     def __init__(self, data, tidy=False):
-        super().__init__(data, tidy)
+        super(SAMIRecordPRN, self).__init__(data, tidy)
 
         for field in re.findall(r'<marcEntry tag="(.*?)" label="(.*?)" ind="(.*?)">(.*?)</marcEntry>', self.data):
             tag, label, ind1, ind2, content = field[0], field[1], field[2][0], field[2][1], field[3]
@@ -359,7 +358,7 @@ class SAMIRecordPRN(SAMIRecord):
 class SAMIRecordXML(SAMIRecord):
 
     def __init__(self, data, tidy=False):
-        super().__init__(data, tidy)
+        super(SAMIRecordXML, self).__init__(data, tidy)
 
         for field in re.findall(r'<(?:marc:)?controlfield tag="(.*?)">(.*?)</(?:marc:)?controlfield>', self.data, re.M):
             tag, data = field[0], field[1]
@@ -386,7 +385,7 @@ class SAMIRecordXML(SAMIRecord):
 class SAMIRecordText(SAMIRecord):
 
     def __init__(self, data, tidy=False):
-        super().__init__(data, tidy)
+        super(SAMIRecordText, self).__init__(data, tidy)
 
         for line in self.data.split('\n'):
             if line:
