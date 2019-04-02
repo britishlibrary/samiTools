@@ -137,6 +137,7 @@ class SAMIReader(object):
             if not line: break
         if not chunk: raise StopIteration
         return self.record(data=chunk, tidy=self.tidy)
+
     def next(self):
         return self.__next__()
 
@@ -436,6 +437,9 @@ class MARCReader(object):
         if len(first5) < 5: raise RecordLengthError
         return MARCRecord(first5 + self.file_handle.read(int(first5) - 5))
 
+    def next(self):
+        return self.__next__()
+
 
 class MARCWriter(object):
     def __init__(self, file_handle):
@@ -475,6 +479,9 @@ class MARCRecord(object):
         if self.__pos >= len(self.fields): raise StopIteration
         self.__pos += 1
         return self.fields[self.__pos - 1]
+
+    def next(self):
+        return self.__next__()
 
     def __str__(self):
         fields, directory = b'', b''
