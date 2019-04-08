@@ -110,4 +110,6 @@ def exit_prompt(message=None):
 def clean_text(s):
     """Function to remove control characters and escape invalid HTML characters <>&"""
     if s is None or not s: return None
-    return escape(re.sub(r'[\u0000-\u001F\u007F-\u009F]', '', unescape(s)))
+    # python 2.7 doesn't seem to like this, so if there's no match just use the original
+    escaped = re.sub(r'[\u0000-\u001F\u007F-\u009F]', '', unescape(s))
+    return escape(escaped or s)

@@ -1,9 +1,9 @@
-#  -*- coding: utf8 -*-
+#  -*- coding: utf-8 -*-
 
 """MARC record processing tools used within samiTools."""
 
 # Import required modules
-
+from __future__ import unicode_literals
 from samiTools.sami_functions import *
 
 __author__ = 'Victoria Morris'
@@ -106,7 +106,7 @@ def sami_factory(reader_type, target, tidy=False):
     if reader_type == 'prn': return SAMIReaderPRN(target, tidy)
     if reader_type == 'xml': return SAMIReaderXML(target, tidy)
     if reader_type == 'txt': return SAMIReaderText(target, tidy)
-    raise Exception('The reader_type {} is not supported.'.format(reader_type))
+    raise Exception('The reader_type {0} is not supported.'.format(reader_type))
 
 
 class SAMIReader(object):
@@ -139,6 +139,9 @@ class SAMIReader(object):
         if not chunk: raise StopIteration
         return self.record(data=chunk, tidy=self.tidy)
 
+    def next(self):
+        return self.__next__()
+
     def while_chunk(self, line):
         if 'xmlns:xsi' in line: return True
         return False
@@ -153,7 +156,7 @@ class SAMIReader(object):
 class SAMIReaderAuthorities(SAMIReader):
 
     def __init__(self, target, tidy=False):
-        super().__init__(target, tidy)
+        super(SAMIReaderAuthorities, self).__init__(target, tidy)
 
     def while_chunk(self, line):
         if 'xmlns:xsi' in line: return True
@@ -172,7 +175,7 @@ class SAMIReaderAuthorities(SAMIReader):
 class SAMIReaderText(SAMIReader):
 
     def __init__(self, target, tidy=False):
-        super().__init__(target, tidy)
+        super(SAMIReaderText, self).__init__(target, tidy)
 
     def record(self, data, tidy):
         return SAMIRecordText(data=data, tidy=tidy)
@@ -185,7 +188,7 @@ class SAMIReaderText(SAMIReader):
 class SAMIReaderPRN(SAMIReader):
 
     def __init__(self, target, tidy=False):
-        super().__init__(target, tidy)
+        super(SAMIReaderPRN, self).__init__(target, tidy)
 
     def record(self, data, tidy):
         return SAMIRecordPRN(data=data, tidy=tidy)
@@ -199,7 +202,7 @@ class SAMIReaderPRN(SAMIReader):
 class SAMIReaderXML(SAMIReader):
 
     def __init__(self, target, tidy=False):
-        super().__init__(target, tidy)
+        super(SAMIReaderXML, self).__init__(target, tidy)
 
     def record(self, data, tidy):
         return SAMIRecordXML(data=data, tidy=tidy)
@@ -244,11 +247,11 @@ class SAMIRecord(object):
     def header(self, deleted=False):
         if self.deleted or deleted:
             return '\n<header status="deleted">\n' \
-                   '<identifier>{}</identifier>\n' \
-                   '<datestamp>{}</datestamp>\n' \
+                   '<identifier>{0}</identifier>\n' \
+                   '<datestamp>{1}</datestamp>\n' \
                    '</header>\n'.format(self.identifier(), self.datestamp())
         return '\n<header>\n' \
-               '<identifier>{}</identifier>\n' \
+               '<identifier>{0}</identifier>\n' \
                '</header>\n'.format(self.identifier())
 
     def is_bad(self):
@@ -258,7 +261,7 @@ class SAMIRecord(object):
 class SAMIRecordAuthorities(SAMIRecord):
 
     def __init__(self, data, tidy=False):
-        super().__init__(data, tidy)
+        super(SAMIRecordAuthorities, self).__init__(data, tidy)
 
         self.data = re.sub(r'\n[ ]{4,}', ' ', self.data)
         self.sid, self.fmt, self.level, self.created, self.created_by, self.modified, self.modified_by, self.cataloged, self.source = data.split('\n', 1)[0].rstrip('\t').split('\t\t')
@@ -316,7 +319,7 @@ class SAMIRecordAuthorities(SAMIRecord):
 class SAMIRecordPRN(SAMIRecord):
 
     def __init__(self, data, tidy=False):
-        super().__init__(data, tidy)
+        super(SAMIRecordPRN, self).__init__(data, tidy)
 
         for field in re.findall(r'<marcEntry tag="(.*?)" label="(.*?)" ind="(.*?)">(.*?)</marcEntry>', self.data):
             tag, label, ind1, ind2, content = field[0], field[1], field[2][0], field[2][1], field[3]
@@ -359,7 +362,7 @@ class SAMIRecordPRN(SAMIRecord):
 class SAMIRecordXML(SAMIRecord):
 
     def __init__(self, data, tidy=False):
-        super().__init__(data, tidy)
+        super(SAMIRecordXML, self).__init__(data, tidy)
 
         for field in re.findall(r'<(?:marc:)?controlfield tag="(.*?)">(.*?)</(?:marc:)?controlfield>', self.data, re.M):
             tag, data = field[0], field[1]
@@ -386,7 +389,7 @@ class SAMIRecordXML(SAMIRecord):
 class SAMIRecordText(SAMIRecord):
 
     def __init__(self, data, tidy=False):
-        super().__init__(data, tidy)
+        super(SAMIRecordText, self).__init__(data, tidy)
 
         for line in self.data.split('\n'):
             if line:
@@ -435,6 +438,9 @@ class MARCReader(object):
         if len(first5) < 5: raise RecordLengthError
         return MARCRecord(first5 + self.file_handle.read(int(first5) - 5))
 
+    def next(self):
+        return self.__next__()
+
 
 class MARCWriter(object):
     def __init__(self, file_handle):
@@ -452,7 +458,7 @@ class MARCWriter(object):
 
 class MARCRecord(object):
     def __init__(self, data='', leader=' ' * LEADER_LENGTH):
-        self.leader = '{}22{}4500'.format(leader[0:10], leader[12:20])
+        self.leader = '{0}22{1}4500'.format(leader[0:10], leader[12:20])
         self.fields = list()
         self.pos = 0
         if len(data) > 0: self.decode_marc(data)
@@ -475,6 +481,9 @@ class MARCRecord(object):
         self.__pos += 1
         return self.fields[self.__pos - 1]
 
+    def next(self):
+        return self.__next__()
+
     def __str__(self):
         fields, directory = b'', b''
         offset = 0
@@ -483,20 +492,20 @@ class MARCRecord(object):
             field_data = field.as_marc()
             fields += field_data
             if field.tag.isdigit():
-                directory += ('%03d' % int(field.tag)).encode('utf-8')
+                directory += ('%03d' % int(field.tag))
             else:
-                directory += ('%03s' % field.tag).encode('utf-8')
-            directory += ('%04d%05d' % (len(field_data), offset)).encode('utf-8')
+                directory += ('%03s' % field.tag)
+            directory += ('%04d%05d' % (len(field_data), offset))
             offset += len(field_data)
 
-        directory += END_OF_FIELD.encode('utf-8')
-        fields += END_OF_RECORD.encode('utf-8')
+        directory += END_OF_FIELD
+        fields += END_OF_RECORD
         base_address = LEADER_LENGTH + len(directory)
         record_length = base_address + len(fields)
         leader = '%05d%s%05d%s' % (record_length, self.leader[5:12], base_address, self.leader[17:])
 
-        text_list = ['=LDR  {}'.format(leader)]
-        text_list.extend([str(field) for field in self.fields])
+        text_list = ['=LDR  {0}'.format(leader)]
+        text_list.extend([field for field in self.fields])
         return '\n'.join(text_list) + '\n'
 
     def add_field(self, *fields):
@@ -591,7 +600,7 @@ class MARCRecord(object):
                         subfields.append(code)
                         subfields.append(data)
                     except:
-                        print('Error in subfield code in field {}'.format(entry_tag))
+                        print('Error in subfield code in field {0}'.format(entry_tag))
                 field = Field(
                     tag=entry_tag,
                     indicators=[first_indicator, second_indicator],
@@ -644,7 +653,7 @@ class MARCRecord(object):
         base_address = LEADER_LENGTH + len(directory)
         record_length = base_address + len(fields)
         leader = '%05d%s%05d%s' % (record_length, self.leader[5:12], base_address, self.leader[17:])
-        xml += '\n\t\t<marc:leader>{}</marc:leader>'.format(leader)
+        xml += '\n\t\t<marc:leader>{0}</marc:leader>'.format(leader)
         for field in self.fields:
             xml += '\n' + field.as_xml()
         return xml + '\n\t</marc:record>'
@@ -655,16 +664,16 @@ class Field(object):
     def __init__(self, tag, indicators=None, subfields=None, data=''):
         if indicators is None: indicators = []
         if subfields is None: subfields = []
-        indicators = [str(x) for x in indicators]
+        indicators = [x.encode('utf-8') for x in indicators]
 
         # Normalize tag to three digits
         self.tag = '%03s' % tag
 
         # Check if tag is a control field
         if self.tag < '010' and self.tag.isdigit():
-            self.data = str(data)
+            self.data = data.encode('utf-8')
         elif self.tag in ALEPH_CONTROL_FIELDS:
-            self.data = str(data)
+            self.data = data.encode('utf-8')
         else:
             self.indicator1, self.indicator2 = self.indicators = indicators
             self.subfields = subfields
@@ -691,17 +700,20 @@ class Field(object):
             return subfield
         raise StopIteration
 
+    def next(self):
+        return self.__next__()
+
     def __str__(self):
         if self.is_control_field() or self.tag in ALEPH_CONTROL_FIELDS:
-            text = '={}  {}'.format(self.tag, self.data.replace(' ', '#'))
+            text = '={0}  {1}'.format(self.tag, self.data.replace(' ', '#'))
         else:
-            text = '={}  '.format(self.tag)
+            text = '={0}  '.format(self.tag)
             for indicator in self.indicators:
                 if indicator in (' ', '#'): text += '#'
                 else: text += indicator
             text += ' '
             for subfield in self:
-                text += '${}{}'.format(subfield[0], subfield[1])
+                text += '${0}{1}'.format(subfield[0], subfield[1])
         return text
 
     def get_subfields(self, *codes):
@@ -709,7 +721,7 @@ class Field(object):
         values = []
         for subfield in self:
             if len(codes) == 0 or subfield[0] in codes:
-                values.append(str(subfield[1]))
+                values.append(subfield[1].encode('utf-8'))
         return values
 
     def add_subfield(self, code, value):
@@ -731,8 +743,8 @@ class Field(object):
 
     def as_xml(self):
         if self.is_control_field():
-            return '\t\t<marc:controlfield tag="{}">{}</marc:controlfield>'.format(self.tag, clean_text(self.data))
-        xml = '\t\t<marc:datafield tag="{}" ind1="{}" ind2="{}">'.format(self.tag, self.indicator1, self.indicator2)
+            return '\t\t<marc:controlfield tag="{0}">{1}</marc:controlfield>'.format(self.tag, clean_text(self.data))
+        xml = '\t\t<marc:datafield tag="{0}" ind1="{1}" ind2="{2}">'.format(self.tag, self.indicator1, self.indicator2)
         for subfield in self:
-            xml += '\n\t\t\t<marc:subfield code="{}">{}</marc:subfield>'.format(subfield[0], clean_text(subfield[1].strip()))
+            xml += '\n\t\t\t<marc:subfield code="{0}">{1}</marc:subfield>'.format(subfield[0], clean_text(subfield[1].strip()))
         return xml + '\n\t\t</marc:datafield>'

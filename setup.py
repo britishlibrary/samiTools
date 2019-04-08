@@ -9,7 +9,10 @@ from distutils.core import setup
 import sys
 
 if sys.platform == "win32":
-    import py2exe
+    try:
+        import py2exe
+    except ImportError:
+        pass
 
 __author__ = 'Victoria Morris'
 __license__ = 'MIT License'
