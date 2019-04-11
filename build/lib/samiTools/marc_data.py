@@ -505,7 +505,7 @@ class MARCRecord(object):
         leader = '%05d%s%05d%s' % (record_length, self.leader[5:12], base_address, self.leader[17:])
 
         text_list = ['=LDR  {0}'.format(leader)]
-        text_list.extend([field for field in self.fields])
+        text_list.extend([str(field) for field in self.fields])
         return '\n'.join(text_list) + '\n'
 
     def add_field(self, *fields):

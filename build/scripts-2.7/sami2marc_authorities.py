@@ -7,6 +7,7 @@
 
 # Import required modules
 from __future__ import print_function
+from __future__ import unicode_literals
 from math import log10
 from samiTools.marc_data import *
 import sys

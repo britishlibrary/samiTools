@@ -13,20 +13,6 @@ from samiTools.marc_data import *
 import profile
 import sys
 import io
-#if sys.version_info.major < 3:
-    #import codecs
-    #from io import open
-    # import warnings
-    # def open(file, mode='r', buffering=-1, encoding=None,
-    #          errors=None, newline=None, closefd=True, opener=None):
-        # if newline is not None:
-        #     warnings.warn('newline is not supported in py2')
-        # if not closefd:
-        #     warnings.warn('closefd is not supported in py2')
-        # if opener is not None:
-        #     warnings.warn('opener is not supported in py2')
-        # return io.open(filename=file, mode=mode, encoding=encoding,
-        #             errors=errors, buffering=buffering)
 
 # Set locale to assist with sorting
 locale.setlocale(locale.LC_ALL, '')
